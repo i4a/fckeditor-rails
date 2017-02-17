@@ -13,7 +13,9 @@ module Fckeditor
   end
 
   def self.load_paths
-    gem_path.join('app/assets').each_child.to_a
+    ['app/assets', 'app/controllers'].flat_map do |path|
+      gem_path.join(path).each_child.to_a
+    end
   end
 
   def self.dependencies
