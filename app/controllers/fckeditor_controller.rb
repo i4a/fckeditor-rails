@@ -10,6 +10,8 @@ class FckeditorController < ActionController::Base
     'image/pjpeg',
     'image/gif',
     'image/png',
+    'application/pdf',
+    'application/x-pdf',
     'application/x-shockwave-flash',
   ]
 
@@ -125,24 +127,23 @@ class FckeditorController < ActionController::Base
     plain_text = strip_tags(CGI.unescape(@original_text))
     @words = FckeditorSpellCheck.check_spelling(plain_text)
 
-    render :file => "#{Fckeditor::PLUGIN_VIEWS_PATH}/fckeditor/spell_check.rhtml"
+    # render :file => "#{Fckeditor::PLUGIN_VIEWS_PATH}/fckeditor/spell_check.html.erb"
+    render 'fckeditor/spell_check'
   end
 
-  private
   def current_directory_path
-    base_dir = "#{UPLOADED_ROOT}/#{params[:Type]}"
-    Dir.mkdir(base_dir,0775) unless File.exists?(base_dir)
+    base_dir = File.join(UPLOADED_ROOT, "#{params[:Type]}")
+    Dir.mkdir(base_dir, 0775) unless File.exists?(base_dir)
     check_path("#{base_dir}#{params[:CurrentFolder]}")
   end
 
   def upload_directory_path
-    uploaded = "/#{UPLOADED}/#{params[:Type]}"
-    "#{uploaded}#{params[:CurrentFolder]}"
+    File.join(UPLOADED, "#{params[:Type]}", "#{params[:CurrentFolder]}")
   end
 
   def check_file(file)
     # check that the file is a tempfile object
-    unless "#{file.class}" == ("Tempfile" || "StringIO")
+    unless "#{file.class}" == ('Tempfile' || 'StringIO')
       @errorNumber = 403
       throw Exception.new
     end
@@ -151,7 +152,7 @@ class FckeditorController < ActionController::Base
 
   def check_path(path)
     exp_path = File.expand_path path
-    if exp_path !~ %r[^#{File.expand_path(Rails.root)}/public#{UPLOADED}]
+    if exp_path !~ %r[^#{File.expand_path(Rails.root, 'public', UPLOADED)}]
       @errorNumber = 403
       throw Exception.new
     end
