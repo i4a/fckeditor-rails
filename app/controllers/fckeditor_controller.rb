@@ -29,8 +29,6 @@ class FckeditorController < ActionController::Base
     render inline: RXML, type: :rxml unless params[:Command] == 'FileUpload'
   end
 
-  private
-
   RXML = <<-EOL
   xml.instruct!
     #=> <?xml version="1.0" encoding="utf-8" ?>
